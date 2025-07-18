@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("project-infosoft")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+471e7e60b61ffadd8a8d44cd14ad8be5d14ace53")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+260b17ac5d823685fe7dca5cb6103870fba9ebf9")]
 [assembly: System.Reflection.AssemblyProductAttribute("project-infosoft")]
 [assembly: System.Reflection.AssemblyTitleAttribute("project-infosoft")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
