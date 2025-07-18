@@ -1,0 +1,6 @@
+@project_infosoft_HostAddress = http://localhost:5027
+
+GET {{project_infosoft_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
