@@ -25,7 +25,6 @@ namespace project_infosoft.Controllers
                     v.Id,
                     v.Title,
                     v.Category,
-                    v.Format,
                     TotalQuantity = v.Quantity,
                     QuantityRented =
                         _context.Rental.Count(r => r.VideoId == r.Id && r.ReturnedDate == DateTime.MinValue),
