@@ -25,12 +25,8 @@ namespace project_infosoft.Controllers
                     v.Id,
                     v.Title,
                     v.Category,
-                    TotalQuantity = v.Quantity,
-                    QuantityRented =
-                        _context.Rental.Count(r => r.VideoId == r.Id && r.ReturnedDate == DateTime.MinValue),
-                    QuantityInside = v.Quantity -
-                                     _context.Rental.Count(r =>
-                                         r.VideoId == r.Id && r.ReturnedDate == DateTime.MinValue)
+                    QuantityRented = _context.Rental.Count(r => r.VideoId == r.Id && r.ReturnedDate == DateTime.MinValue),
+                    QuantityInside = v.Quantity - _context.Rental.Count(r => r.VideoId == r.Id && r.ReturnedDate == DateTime.MinValue)
                 }).ToListAsync();
 
             return Ok(report);
