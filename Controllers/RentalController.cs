@@ -70,8 +70,8 @@ namespace project_infosoft.Controllers
                 return BadRequest("Video not found");
             }
 
-            // ternary operator for VCD is 25 pesos and DVD is 50 pesos
-            decimal price = video.Format == "VCD" ? 25m : video.Format == "DVD" ? 50m : 0;
+            // ternary operator for VCD Category is 25 pesos and DVD Category is 50 pesos
+            decimal price = video.Category == "VCD" ? 25m : video.Category == "DVD" ? 50m : 0;
             var rental = new Rental
             {
                 CustomerId = rentalDto.CustomerId,
@@ -146,7 +146,6 @@ namespace project_infosoft.Controllers
                     Id = rental.Video.Id,
                     Title = rental.Video.Title,
                     Category = rental.Video.Category,
-                    Format = rental.Video.Format,
                     BorrowedAt = rental.Video.BorrowedAt,
                     ReturnedAt = rental.Video.ReturnedAt
                 }
