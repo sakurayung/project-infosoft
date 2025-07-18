@@ -78,7 +78,8 @@ namespace project_infosoft.Controllers
                 VideoId = rentalDto.VideoId,
                 Price = price,
                 OverdueDate = rentalDto.OverdueDate,
-                ReturnedDate = DateTime.MinValue
+                ReturnedDate = DateTime.MinValue,
+                Quantity = rentalDto.Quantity
             };
 
 

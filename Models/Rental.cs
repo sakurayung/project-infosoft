@@ -14,10 +14,13 @@ namespace project_infosoft.Models
         public DateTime BorrowedDate { get; set; }
         public DateTime ReturnedDate { get; set; }
         public DateTime OverdueDate { get; set; }
+        public int Quantity { get; set; }
+
 
         // ONE-TO-MANY RELATIONSHIP
         public Customer Customer { get; set; } = null!;
         public Video Video { get; set; } = null!;
+
     }
 
     public class PriceConstraintAttribute : ValidationAttribute 

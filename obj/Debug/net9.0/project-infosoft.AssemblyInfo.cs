@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("project-infosoft")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c66ceba6462747daea893c0ad98c3fd0def209f1")]
 [assembly: System.Reflection.AssemblyProductAttribute("project-infosoft")]
 [assembly: System.Reflection.AssemblyTitleAttribute("project-infosoft")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

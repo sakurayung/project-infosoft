@@ -8,5 +8,6 @@
         public string Format { get; set; } = string.Empty;
         public DateTime BorrowedAt { get; set; }
         public DateTime ReturnedAt { get; set; }
+        public int Quantity { get; set; }
     }
 }

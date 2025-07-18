@@ -26,7 +26,8 @@ namespace project_infosoft.Controllers
                 Title = x.Title,
                 Category = x.Category,
                 BorrowedAt = x.BorrowedAt,
-                ReturnedAt = x.ReturnedAt
+                ReturnedAt = x.ReturnedAt,
+                Quantity = x.Quantity
             }).ToListAsync();
 
             return Ok(videos);
@@ -94,6 +95,7 @@ namespace project_infosoft.Controllers
                 Category = videoDto.Category,
                 BorrowedAt = DateTime.UtcNow,
                 ReturnedAt = videoDto.ReturnedAt,
+                Quantity = videoDto.Quantity > 0 ? videoDto.Quantity : 1,
             };
 
             _context.Video.Add(video);
