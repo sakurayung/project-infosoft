@@ -93,45 +93,6 @@ pnpm run dev
 
 The frontend will be available at: `http://localhost:5173`
 
-**Note**: The dockerized frontend runs on port 3000, but local development runs on port 5173.
-
-## 🐳 Docker Setup (Alternative)
-
-### Run Everything with Docker
-
-```bash
-# Build and start all services
-docker-compose up --build
-
-# Run in detached mode
-docker-compose up -d --build
-```
-
-### Services
-
-| Service | URL | Description |
-|---------|-----|-------------|
-| Frontend | http://localhost:3000 | React + Vite SPA |
-| Backend | http://localhost:5000 | .NET Web API |
-| PostgreSQL | localhost:5432 | Database |
-| Swagger | http://localhost:5000/swagger | API Documentation |
-
-### Docker Commands
-
-```bash
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
-
-# Rebuild specific service
-docker-compose build --no-cache frontend
-docker-compose build --no-cache backend
-
-# Remove volumes (⚠️ deletes database data)
-docker-compose down -v
-```
 
 ## 🔧 Development Workflow
 
