@@ -251,6 +251,12 @@ function VideoCard({
               {video.quantity > 0 ? 'Available' : 'Out of Stock'}
             </span>
           </div>
+          <div className="flex justify-between">
+            <span className="text-blue-600 dark:text-blue-400">Rental Days:</span>
+            <span className="font-medium text-blue-900 dark:text-blue-100">
+              {video.rentDays} day{video.rentDays !== 1 ? 's' : ''}
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -273,6 +279,7 @@ function VideoForm({
     category: video?.category as 'DVD' | 'VCD' || 'DVD',
     price: video?.price || 50,
     quantity: video?.quantity || 1,
+    rentDays: video?.rentDays || 1, 
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -289,7 +296,7 @@ function VideoForm({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-white/30 bg-opacity-50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-md border-blue-200">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -373,6 +380,27 @@ function VideoForm({
                 min="1"
                 required
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                Rental Days (1-3 days)
+              </label>
+              <select
+                value={formData.rentDays}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    rentDays: Number(e.target.value),
+                  }))
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value={1}>1 Day</option>
+                <option value={2}>2 Days</option>
+                <option value={3}>3 Days</option>
+              </select>
             </div>
 
             <div className="flex gap-2 pt-4">

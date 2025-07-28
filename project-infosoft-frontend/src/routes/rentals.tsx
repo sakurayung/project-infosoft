@@ -122,6 +122,45 @@ const formatDate = (dateString: string | null | undefined) => {
   }
 };
 
+const calculateDueDate = (rentalDate: string, rentDays: number) => {
+  const rental = new Date(rentalDate);
+  const due = new Date(rental);
+  due.setDate(due.getDate() + rentDays);
+  return due;
+};
+
+const calculateStatus = (rental: RentalDTO) => {
+  if (rental.isReturned) {
+    return { type: "returned", label: "Returned", icon: CheckCircle, color: "green" };
+  }
+
+  const video = videos?.find(v => v.id === rental.videoId);
+  if (!video) {
+    return { type: "unknown", label: "Unknown", icon: Clock, color: "gray" };
+  }
+
+  const now = new Date();
+  const dueDate = calculateDueDate(rental.borrowedDate, video.rentDays); // Use video.rentDays
+  const daysDiff = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (daysDiff < 0) {
+    return { 
+      type: "overdue", 
+      label: `${Math.abs(daysDiff)} day${Math.abs(daysDiff) !== 1 ? 's' : ''} overdue`, 
+      color: "red" 
+    };
+  } else if (daysDiff === 0) {
+    return { type: "due-today", label: "Due today", icon: Clock, color: "orange" };
+  } else {
+    return { 
+      type: "active", 
+      label: `${daysDiff} day${daysDiff !== 1 ? 's' : ''} left`, 
+      icon: Clock, 
+      color: "blue" 
+    };
+  }
+};
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -342,10 +381,64 @@ function RentalForm({
     rentalDate: rental?.borrowedDate
       ? rental.borrowedDate.split("T")[0]
       : new Date().toISOString().split("T")[0],
-    returnDate: rental?.returnedDate ? rental.returnedDate.split("T")[0] : null,
+    returnDate: rental?.returnedDate ? rental.returnedDate.split("T")[0] : "",
     isReturned: rental?.returnedDate ? true : false,
     quantity: rental?.quantity || 1,
   });
+
+  const selectedVideo = videos.find((v) => v.id === formData.videoId);
+
+  const calculateDueDate = () => {
+    if (!selectedVideo || !formData.rentalDate) return null;
+    
+    const rentalDate = new Date(formData.rentalDate);
+    const dueDate = new Date(rentalDate);
+    dueDate.setDate(dueDate.getDate() + selectedVideo.rentDays);
+    
+    return dueDate;
+  };
+
+  const formatDueDate = () => {
+    const dueDate = calculateDueDate();
+    if (!dueDate) return null;
+    
+    return dueDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Validation for return date
+  const validateReturnDate = () => {
+    if (!selectedVideo || !formData.rentalDate || !formData.returnDate) return null;
+    
+    const rentalDate = new Date(formData.rentalDate);
+    const returnDate = new Date(formData.returnDate);
+    const dueDate = calculateDueDate();
+    
+    if (returnDate < rentalDate) {
+      return {
+        type: "error",
+        message: "Return date cannot be before rental date"
+      };
+    }
+    
+    if (dueDate && returnDate > dueDate) {
+      const overdueDays = Math.ceil((returnDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+      return {
+        type: "warning",
+        message: `Return is ${overdueDays} day${overdueDays !== 1 ? 's' : ''} overdue! Late fees may apply.`
+      };
+    }
+    
+    return {
+      type: "success",
+      message: "Return date is within the allowed rental period"
+    };
+  };
+
+  const returnDateValidation = validateReturnDate();
 
   const dateToISOString = (dateString: string): string => {
     const date = new Date(dateString + "T12:00:00.000Z");
@@ -361,66 +454,45 @@ function RentalForm({
         returnDate: formData.returnDate
           ? dateToISOString(formData.returnDate)
           : null,
-        isReturned: formData.isReturned,
+        isReturned: !!formData.returnDate, 
       });
     }
   };
-
-  const selectedVideo = videos.find((v) => v.id === formData.videoId);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuantity = Number(e.target.value);
     setFormData((prev) => ({ ...prev, quantity: newQuantity }));
   };
 
-  const handleReturnedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isReturned = e.target.checked;
-    const newReturnDate = isReturned
-      ? new Date().toISOString().split("T")[0]
-      : null;
-
-    console.log("🔥🔥🔥 CHECKBOX CLICKED 🔥🔥🔥");
-    console.log("Previous state:", {
-      isReturned: formData.isReturned,
-      returnDate: formData.returnDate,
-    });
-    console.log("Checkbox checked:", isReturned);
-    console.log("New return date:", newReturnDate);
-
-    setFormData((prev) => {
-      const newState = {
-        ...prev,
-        isReturned,
-        returnDate: newReturnDate,
-      };
-
-      console.log("Setting new state:", newState);
-      console.log("isReturned will be:", newState.isReturned);
-      console.log("returnDate will be:", newState.returnDate);
-
-      return newState;
-    });
-
-    setTimeout(() => {
-      console.log("State after update:", {
-        isReturned: formData.isReturned,
-        returnDate: formData.returnDate,
-      });
-    }, 100);
-  };
-
   const handleReturnDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const returnDate = e.target.value || null;
+    const returnDate = e.target.value || "";
     setFormData((prev) => ({
       ...prev,
       returnDate,
-      isReturned: !!returnDate, 
+      isReturned: !!returnDate, // Auto-set isReturned based on return date
+    }));
+  };
+
+  const handleQuickReturnToday = () => {
+    const today = new Date().toISOString().split("T")[0];
+    setFormData((prev) => ({
+      ...prev,
+      returnDate: today,
+      isReturned: true,
+    }));
+  };
+
+  const handleClearReturnDate = () => {
+    setFormData((prev) => ({
+      ...prev,
+      returnDate: "",
+      isReturned: false,
     }));
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-md border-blue-200">
+    <div className="fixed inset-0 bg-white/30 flex items-center justify-center p-4 z-50">
+      <Card className="w-full max-w-lg border-blue-200 bg-white dark:bg-gray-900">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>{rental ? "Edit Rental" : "Add New Rental"}</CardTitle>
@@ -477,21 +549,15 @@ function RentalForm({
                 <option value={0}>Select a video</option>
                 {videos.map((video) => (
                   <option key={video.id} value={video.id}>
-                    {video.title} ({video.category} - ₱{video.price} - Stock:{" "}
-                    {video.quantity})
+                    {video.title} ({video.category} )
                   </option>
                 ))}
               </select>
-              {selectedVideo && (
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                  Available stock: {selectedVideo.quantity} copies
-                </p>
-              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-                Quantity to Rent
+                Quantity
               </label>
               <Input
                 type="number"
@@ -502,11 +568,6 @@ function RentalForm({
                 placeholder="Enter quantity"
                 required
               />
-              {selectedVideo && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Maximum available: {selectedVideo.quantity} copies
-                </p>
-              )}
             </div>
 
             <div>
@@ -526,70 +587,98 @@ function RentalForm({
               />
             </div>
 
+            {selectedVideo && formData.rentalDate && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-blue-700 dark:text-blue-300">
+                    <strong>Due Date:</strong> {formatDueDate()}
+                  </span>
+                  <span className="text-blue-700 dark:text-blue-300">
+                    <strong>Total:</strong> ₱{(selectedVideo.price * formData.quantity).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            )}
+
             <div>
-              <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-                Return Date
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Return Date (Optional)
+                </label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleQuickReturnToday}
+                    className="text-xs px-2 py-1 h-6"
+                  >
+                    Today
+                  </Button>
+                  {formData.returnDate && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleClearReturnDate}
+                      className="text-xs px-2 py-1 h-6 text-red-600"
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </div>
               <Input
                 type="date"
-                value={formData.returnDate || ""}
+                //@ts-ignore
+                value={formData.returnDate}
                 onChange={handleReturnDateChange}
-                disabled={!formData.isReturned}
+                className={cn(
+                  "w-full",
+                  returnDateValidation?.type === "error" && "border-red-500 focus:ring-red-500",
+                  returnDateValidation?.type === "warning" && "border-yellow-500 focus:ring-yellow-500",
+                  returnDateValidation?.type === "success" && "border-green-500 focus:ring-green-500"
+                )}
               />
-              {!formData.isReturned && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Check "Mark as returned" to set return date
-                </p>
+              
+              {/* Return Date Validation Messages */}
+              {returnDateValidation && (
+                <div className={cn(
+                  "mt-2 p-2 rounded-md text-xs",
+                  returnDateValidation.type === "error" && "bg-red-50 text-red-700 border border-red-200",
+                  returnDateValidation.type === "warning" && "bg-yellow-50 text-yellow-700 border border-yellow-200",
+                  returnDateValidation.type === "success" && "bg-green-50 text-green-700 border border-green-200"
+                )}>
+                  {returnDateValidation.message}
+                </div>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="isReturned"
-                checked={formData.isReturned}
-                onChange={handleReturnedChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label
-                htmlFor="isReturned"
-                className="text-sm font-medium text-blue-900 dark:text-blue-100"
-              >
-                Mark as returned
-              </label>
-            </div>
-
+            {/* Status Display */}
             <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Status Preview:
+                  Status:
                 </span>
-                {formData.isReturned ? (
+                {formData.returnDate ? (
                   <>
                     <CheckCircle className="w-4 h-4 text-green-600" />
                     <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                      Returned
+                      Returned on {new Date(formData.returnDate).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </span>
                   </>
                 ) : (
                   <>
                     <Clock className="w-4 h-4 text-yellow-600" />
                     <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                      Active
+                      Active Rental
                     </span>
                   </>
                 )}
               </div>
-              {formData.isReturned && formData.returnDate && (
-                <p className="text-xs text-gray-600 mt-1">
-                  Return date:{" "}
-                  {new Date(formData.returnDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </p>
-              )}
             </div>
 
             <div className="flex gap-2 pt-4">
@@ -605,11 +694,14 @@ function RentalForm({
               <Button
                 type="submit"
                 disabled={
-                  isLoading || !formData.customerId || !formData.videoId
+                  isLoading || 
+                  !formData.customerId || 
+                  !formData.videoId ||
+                  returnDateValidation?.type === "error"
                 }
                 className="flex-1"
               >
-                {isLoading ? "Saving..." : rental ? "Update" : "Add"} Rental
+                {isLoading ? "Saving..." : rental ? "Update" : "Create"} Rental
               </Button>
             </div>
           </form>

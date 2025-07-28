@@ -139,7 +139,6 @@ function RouteComponent() {
         </CardContent>
       </Card>
 
-      {/* Customer Rental Report */}
       <Card className="border-blue-200">
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -153,7 +152,6 @@ function RouteComponent() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Customer Selection */}
           <div className="flex gap-4 items-end">
             <div className="flex-1">
               <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
@@ -182,7 +180,6 @@ function RouteComponent() {
             </Button>
           </div>
 
-          {/* Customer Report Results */}
           {showCustomerReport && selectedCustomerId && (
             <div className="mt-6">
               {customerLoading ? (

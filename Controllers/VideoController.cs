@@ -28,6 +28,7 @@ namespace project_infosoft.Controllers
                 Price = x.Price,
                 BorrowedAt = x.BorrowedAt,
                 ReturnedAt = x.ReturnedAt,
+                RentDays = x.RentDays,
                 Quantity = x.Quantity
             }).ToListAsync();
 
@@ -62,11 +63,17 @@ namespace project_infosoft.Controllers
                 return NotFound();
             }
 
+            if (videoDto.RentDays < 1 || videoDto.RentDays > 3)
+            {
+                return BadRequest("RentDays must be between 1 and 3 days");
+            }
+
             video.Title = videoDto.Title;
             video.Category = videoDto.Category;
             video.Price = videoDto.Price;
-            video.Quantity = videoDto.Quantity;  
-            video.BorrowedAt = videoDto.BorrowedAt; 
+            video.Quantity = videoDto.Quantity;
+            video.RentDays = videoDto.RentDays;
+            video.BorrowedAt = videoDto.BorrowedAt;
             video.ReturnedAt = videoDto.ReturnedAt;
 
             _context.Entry(video).State = EntityState.Modified;
@@ -87,7 +94,7 @@ namespace project_infosoft.Controllers
         [HttpPost]
         public async Task<ActionResult<VideoDTO>> AddVideo(VideoDTO videoDto)
         {
-            
+
             // Category should only be VCD OR DVD
             if (videoDto.Category != "DVD" && videoDto.Category != "VCD")
             {
@@ -98,17 +105,24 @@ namespace project_infosoft.Controllers
                 (videoDto.Category == "DVD" && videoDto.Price != 50))
             {
                 return BadRequest($"{videoDto.Category} must be priced at exactly {(videoDto.Category == "VCD" ? 25 : 50)} pesos");
+
+            }
+
+            if (videoDto.RentDays < 1 || videoDto.RentDays > 3)
+            {
+                return BadRequest("Rent days must be between 1 and 3");
             }
 
             var video = new Video
-                {
-                    Title = videoDto.Title,
-                    Category = videoDto.Category,
-                    BorrowedAt = DateTime.UtcNow,
-                    ReturnedAt = videoDto.ReturnedAt,
-                    Price = videoDto.Price,
-                    Quantity = videoDto.Quantity
-                };
+            {
+                Title = videoDto.Title,
+                Category = videoDto.Category,
+                BorrowedAt = DateTime.UtcNow,
+                ReturnedAt = videoDto.ReturnedAt,
+                RentDays = videoDto.RentDays,
+                Price = videoDto.Price,
+                Quantity = videoDto.Quantity
+            };
 
             _context.Video.Add(video);
             await _context.SaveChangesAsync();
@@ -145,6 +159,7 @@ namespace project_infosoft.Controllers
                 Category = video.Category,
                 Price = video.Price,
                 Quantity = video.Quantity,
+                RentDays = video.RentDays,
                 BorrowedAt = video.BorrowedAt,
                 ReturnedAt = video.ReturnedAt
             };

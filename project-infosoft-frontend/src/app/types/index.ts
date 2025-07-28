@@ -13,6 +13,7 @@ export interface Video {
   borrowedAt: string;
   returnedAt: string;
   quantity: number;
+  rentDays: number;
 }
 
 export interface Rental {
@@ -79,6 +80,7 @@ export interface VideoDTO extends Video {
   borrowedAt: string;
   returnedAt: string;
   quantity: number;
+  rentDays: number;
 }
 
 export interface RentalDTO extends Rental {
@@ -109,6 +111,7 @@ export interface VideoFormValues {
     category: 'DVD' | 'VCD';
     price: number;
     quantity: number;
+    rentDays: number;
 }
 
 export interface CustomerFormValues {

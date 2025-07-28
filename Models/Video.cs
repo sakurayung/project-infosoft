@@ -11,6 +11,9 @@ namespace project_infosoft.Models
         public decimal Price { get; set; }
         public DateTime BorrowedAt { get; set; }
         public DateTime ReturnedAt { get; set; }
+        [Required]
+        [Range(1,3)]
+        public int RentDays { get; set; }
         public int Quantity { get; set; }
 
 
