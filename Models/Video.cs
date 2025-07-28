@@ -8,6 +8,7 @@ namespace project_infosoft.Models
         public string Title { get; set; } = string.Empty;
         [Required]
         public string Category { get; set; } = string.Empty;
+        public decimal Price { get; set; }
         public DateTime BorrowedAt { get; set; }
         public DateTime ReturnedAt { get; set; }
         public int Quantity { get; set; }

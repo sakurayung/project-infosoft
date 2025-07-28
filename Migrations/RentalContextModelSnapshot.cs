@@ -60,6 +60,9 @@ namespace project_infosoft.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
 
+                    b.Property<decimal>("DuePrice")
+                        .HasColumnType("numeric");
+
                     b.Property<DateTime>("OverdueDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -74,6 +77,9 @@ namespace project_infosoft.Migrations
 
                     b.Property<int>("VideoId")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("isReturned")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -99,9 +105,8 @@ namespace project_infosoft.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Format")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");

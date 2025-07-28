@@ -25,6 +25,7 @@ namespace project_infosoft.Controllers
                 Id = x.Id,
                 Title = x.Title,
                 Category = x.Category,
+                Price = x.Price,
                 BorrowedAt = x.BorrowedAt,
                 ReturnedAt = x.ReturnedAt,
                 Quantity = x.Quantity
@@ -89,14 +90,21 @@ namespace project_infosoft.Controllers
                 return BadRequest("Category must be either DVD or VCD");
             }
 
-            var video = new Video
+            if ((videoDto.Category == "VCD" && videoDto.Price != 25) ||
+                (videoDto.Category == "DVD" && videoDto.Price != 50))
             {
-                Title = videoDto.Title,
-                Category = videoDto.Category,
-                BorrowedAt = DateTime.UtcNow,
-                ReturnedAt = videoDto.ReturnedAt,
-                Quantity = videoDto.Quantity > 0 ? videoDto.Quantity : 1,
-            };
+                return BadRequest($"{videoDto.Category} must be priced at exactly {(videoDto.Category == "VCD" ? 25 : 50)} pesos");
+            }
+
+            var video = new Video
+                {
+                    Title = videoDto.Title,
+                    Category = videoDto.Category,
+                    BorrowedAt = DateTime.UtcNow,
+                    ReturnedAt = videoDto.ReturnedAt,
+                    Price = videoDto.Price,
+                    Quantity = videoDto.Quantity
+                };
 
             _context.Video.Add(video);
             await _context.SaveChangesAsync();
@@ -131,6 +139,8 @@ namespace project_infosoft.Controllers
                 Id = video.Id,
                 Title = video.Title,
                 Category = video.Category,
+                Price = video.Price,
+                Quantity = video.Quantity,
                 BorrowedAt = video.BorrowedAt,
                 ReturnedAt = video.ReturnedAt
             };

@@ -28,7 +28,11 @@ namespace project_infosoft.Controllers
                     Id = x.Id,
                     CustomerId = x.CustomerId,
                     VideoId = x.VideoId,
+                    Price = x.Price,
                     OverdueDate = x.OverdueDate,
+                    ReturnedDate = x.ReturnedDate,
+                    BorrowedDate = x.BorrowedDate,
+                    isReturned = x.isReturned,
                     Customer = new CustomerDTO
                     {
                         Id = x.Customer.Id,
@@ -40,8 +44,6 @@ namespace project_infosoft.Controllers
                         Id = x.Video.Id,
                         Title = x.Video.Title,
                         Category = x.Video.Category,
-                        BorrowedAt = x.Video.BorrowedAt,
-                        ReturnedAt = x.Video.ReturnedAt
                     }
                 }).ToListAsync();
             return Ok(rentals);
@@ -51,13 +53,18 @@ namespace project_infosoft.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RentalDTO>> GetRentalById(int id)
         {
-            var rental = await _context.Rental.FindAsync(id);
+            var rental = await _context.Rental
+                .Include(r => r.Customer)
+                .Include(r => r.Video)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
             if (rental == null)
             {
                 return NotFound();
             }
-            return Ok(rental);
+            return Ok(RentalToDTO(rental));
         }
+
 
         //POST: api/rental/rent
         [HttpPost("rent")]
@@ -65,23 +72,31 @@ namespace project_infosoft.Controllers
         {
 
             var video = await _context.Video.FindAsync(rentalDto.VideoId);
-            if (video == null)
+            var customer = await _context.Customer.FindAsync(rentalDto.CustomerId);
+
+            if (video == null || customer == null)
             {
-                return BadRequest("Video not found");
+                return NotFound(new { message = "Customer or video not found" });
             }
 
-            // ternary operator for VCD Category is 25 pesos and DVD Category is 50 pesos
-            decimal price = video.Category == "VCD" ? 25m : video.Category == "DVD" ? 50m : 0;
+            var quantity = rentalDto.Quantity > 0 ? rentalDto.Quantity : 1;
+            decimal basePrice = video.Category == "VCD" ? 25m : video.Category == "DVD" ? 50m : 0;
+            decimal totalRentPrice = basePrice * rentalDto.Quantity;
+
+
             var rental = new Rental
             {
                 CustomerId = rentalDto.CustomerId,
                 VideoId = rentalDto.VideoId,
-                Price = price,
-                OverdueDate = rentalDto.OverdueDate,
-                ReturnedDate = DateTime.MinValue,
-                Quantity = rentalDto.Quantity
+                Price = totalRentPrice,
+                BorrowedDate = DateTime.UtcNow,
+                OverdueDate = DateTime.UtcNow.AddDays(3),
+                ReturnedDate = rentalDto.ReturnedDate,
+                Quantity = rentalDto.Quantity,
+                isReturned = false
             };
 
+            _context.Entry(video).State = EntityState.Modified;
 
             _context.Rental.Add(rental);
             await _context.SaveChangesAsync();
@@ -133,21 +148,20 @@ namespace project_infosoft.Controllers
                 CustomerId = rental.CustomerId,
                 VideoId = rental.VideoId,
                 Price = rental.Price,
+                Quantity = rental.Quantity,
                 OverdueDate = rental.OverdueDate,
                 ReturnedDate = rental.ReturnedDate,
+                isReturned = rental.isReturned,
                 Customer = new CustomerDTO {
                     Id = rental.Customer.Id,
                     firstName = rental.Customer.firstName,
                     lastName = rental.Customer.lastName,
-                    CreatedAt = rental.Customer.CreatedAt
                 },
                 Video = new VideoDTO
                 {
                     Id = rental.Video.Id,
                     Title = rental.Video.Title,
                     Category = rental.Video.Category,
-                    BorrowedAt = rental.Video.BorrowedAt,
-                    ReturnedAt = rental.Video.ReturnedAt
                 }
             };
 

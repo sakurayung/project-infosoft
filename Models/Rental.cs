@@ -9,30 +9,20 @@ namespace project_infosoft.Models
         public int VideoId { get; set; }
 
         [Required]
-        [PriceConstraint]
         public decimal Price { get; set; }
+        public decimal DuePrice { get; set; }
         public DateTime BorrowedDate { get; set; }
         public DateTime ReturnedDate { get; set; }
         public DateTime OverdueDate { get; set; }
         public int Quantity { get; set; }
 
+        [Required] public Boolean isReturned { get; set; }
 
-        // ONE-TO-MANY RELATIONSHIP
+
+        // Navigation Properties
         public Customer Customer { get; set; } = null!;
         public Video Video { get; set; } = null!;
 
     }
 
-    public class PriceConstraintAttribute : ValidationAttribute 
-    {
-        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
-        {
-            if (value is decimal and (25m or 50m))
-            {
-                return ValidationResult.Success;
-            }
-
-            return new ValidationResult("Price must be either 25 or 50 pesos");
-        }
-    }
 }
