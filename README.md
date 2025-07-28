@@ -1,4 +1,4 @@
-# Video Rental Management System
+# Bogsy Rental Video Store
 
 A full-stack video rental management system built with .NET 8 Web API backend, React + Vite frontend, and PostgreSQL database.
 
