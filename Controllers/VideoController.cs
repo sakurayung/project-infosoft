@@ -44,7 +44,7 @@ namespace project_infosoft.Controllers
             {
                 return NotFound();
             }
-            return Ok(video);
+            return Ok(VideoToDTO(video));
         }
 
         //PUT: api/video/{id}
@@ -64,6 +64,10 @@ namespace project_infosoft.Controllers
 
             video.Title = videoDto.Title;
             video.Category = videoDto.Category;
+            video.Price = videoDto.Price;
+            video.Quantity = videoDto.Quantity;  
+            video.BorrowedAt = videoDto.BorrowedAt; 
+            video.ReturnedAt = videoDto.ReturnedAt;
 
             _context.Entry(video).State = EntityState.Modified;
 

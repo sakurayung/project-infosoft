@@ -7,8 +7,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RentalContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("RentalContext") ?? throw new InvalidOperationException("Connection string 'RentalContext' not found.")));
 
-// Add services to the container.
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") 
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
@@ -22,6 +34,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowReactApp");
 
 app.UseHttpsRedirection();
 

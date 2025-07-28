@@ -32,6 +32,7 @@ namespace project_infosoft.Controllers
                     OverdueDate = x.OverdueDate,
                     ReturnedDate = x.ReturnedDate,
                     BorrowedDate = x.BorrowedDate,
+                    Quantity = x.Quantity,
                     isReturned = x.isReturned,
                     Customer = new CustomerDTO
                     {
@@ -83,6 +84,7 @@ namespace project_infosoft.Controllers
             decimal basePrice = video.Category == "VCD" ? 25m : video.Category == "DVD" ? 50m : 0;
             decimal totalRentPrice = basePrice * rentalDto.Quantity;
 
+            video.Quantity -= rentalDto.Quantity;
 
             var rental = new Rental
             {
@@ -93,11 +95,10 @@ namespace project_infosoft.Controllers
                 OverdueDate = DateTime.UtcNow.AddDays(3),
                 ReturnedDate = rentalDto.ReturnedDate,
                 Quantity = rentalDto.Quantity,
-                isReturned = false
+                isReturned = rentalDto.isReturned
             };
 
             _context.Entry(video).State = EntityState.Modified;
-
             _context.Rental.Add(rental);
             await _context.SaveChangesAsync();
 
@@ -123,6 +124,7 @@ namespace project_infosoft.Controllers
             }
 
             rental.ReturnedDate = DateTime.UtcNow;
+            rental.isReturned = true;
 
             // Videos that are due are charged for 5 pesos per day after the overdue date.
             if (rental.ReturnedDate > rental.OverdueDate)
@@ -149,6 +151,7 @@ namespace project_infosoft.Controllers
                 VideoId = rental.VideoId,
                 Price = rental.Price,
                 Quantity = rental.Quantity,
+                BorrowedDate = rental.BorrowedDate,
                 OverdueDate = rental.OverdueDate,
                 ReturnedDate = rental.ReturnedDate,
                 isReturned = rental.isReturned,

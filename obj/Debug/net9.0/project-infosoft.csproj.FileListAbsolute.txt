@@ -250,8 +250,8 @@ C:\Users\jorspacturan\source\repos\project-infosoft\bin\Debug\net9.0\tr\Microsof
 C:\Users\jorspacturan\source\repos\project-infosoft\bin\Debug\net9.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\jorspacturan\source\repos\project-infosoft\bin\Debug\net9.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\jorspacturan\source\repos\project-infosoft\obj\Debug\net9.0\project-infosoft.sourcelink.json
-C:\Users\jorspacturan\source\repos\project-infosoft\bin\Debug\net9.0\project-infosoft-frontend\package-lock.json
 C:\Users\jorspacturan\source\repos\project-infosoft\bin\Debug\net9.0\project-infosoft-frontend\package.json
 C:\Users\jorspacturan\source\repos\project-infosoft\bin\Debug\net9.0\project-infosoft-frontend\tsconfig.app.json
 C:\Users\jorspacturan\source\repos\project-infosoft\bin\Debug\net9.0\project-infosoft-frontend\tsconfig.json
 C:\Users\jorspacturan\source\repos\project-infosoft\bin\Debug\net9.0\project-infosoft-frontend\tsconfig.node.json
+C:\Users\jorspacturan\source\repos\project-infosoft\bin\Debug\net9.0\project-infosoft-frontend\components.json
